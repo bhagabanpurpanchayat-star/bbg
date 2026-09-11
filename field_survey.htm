@@ -23,32 +23,6 @@ body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%;
 .sync-banner .refresh-link { color: #63b3ed; cursor: pointer; text-decoration: underline; font-weight: 700; flex-shrink: 0; }
 .sync-banner #syncText { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* DASHBOARD STAMP */
-.stamp-dash { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 10px; margin-bottom: 12px; }
-.stamp-title { font-size: 10px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-.stamp-title .badge-mini { background: rgba(237,137,54,0.2); color: #f6ad55; font-size: 9px; padding: 1px 7px; border-radius: 20px; font-weight: 800; }
-
-/* MINI STATS */
-.mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
-.mini-stat { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 9px; padding: 7px 4px; text-align: center; }
-.mini-stat .v { font-size: 18px; font-weight: 800; line-height: 1; }
-.mini-stat .l { font-size: 8.5px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 700; margin-top: 3px; }
-.mini-stat.total .v { background: linear-gradient(135deg,#63b3ed,#4299e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.mini-stat.done .v { background: linear-gradient(135deg,#48bb78,#38a169); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.mini-stat.pend .v { background: linear-gradient(135deg,#f6ad55,#ed8936); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-/* PENDING BATCH STAMP */
-.batch-stamp { background: rgba(237,137,54,0.06); border: 1px solid rgba(237,137,54,0.18); border-radius: 10px; padding: 8px; }
-.batch-stamp-title { font-size: 9.5px; color: #f6ad55; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; justify-content: space-between; }
-.batch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 5px; max-height: 130px; overflow-y: auto; padding-right: 2px; }
-.batch-grid::-webkit-scrollbar { width: 4px; }
-.batch-grid::-webkit-scrollbar-thumb { background: rgba(237,137,54,0.35); border-radius: 10px; }
-.batch-chip { background: rgba(237,137,54,0.12); border: 1px solid rgba(237,137,54,0.25); border-radius: 8px; padding: 5px 6px; display: flex; flex-direction: column; gap: 2px; }
-.batch-chip .b-loc { font-size: 9px; color: #fbd38d; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.batch-chip .b-count { font-size: 14px; color: #f6ad55; font-weight: 800; line-height: 1; }
-.batch-empty { text-align: center; color: #68d391; font-size: 10.5px; padding: 14px 6px; font-weight: 700; }
-.batch-empty .ic { font-size: 20px; display: block; margin-bottom: 4px; }
-
 /* FORM */
 .form-group { margin-bottom: 10px; }
 label { display: block; font-size: 12px; font-weight: 700; color: #e2e8f0; margin-bottom: 5px; }
@@ -164,36 +138,14 @@ input:disabled { opacity: 0.6; cursor: not-allowed; }
 
 <div class="container" id="surveyContainer">
   <div class="header">
-    <h1>📋 Field Survey</h1>
-    <p>Job Card Mapping · Vill-Arbara, Chanchal, Malda</p>
+    <h1>📋 BBG  VS JOBCARD MAPPING</h1>
+    <p>For technical Support plz contact @Akram Mobile-⚠️9733280384</p>
   </div>
 
   <!-- SYNC BANNER -->
   <div class="sync-banner" id="syncBanner">
     <span id="syncText"><span class="loading"></span> Loading data...</span>
     <span class="refresh-link" onclick="syncFromServer(true)">Refresh</span>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div class="stamp-dash">
-    <div class="stamp-title">
-      <span>📊 Dashboard</span>
-      <span class="badge-mini" id="pendingBadge">—</span>
-    </div>
-    <div class="mini-stats">
-      <div class="mini-stat total"><div class="v" id="statTotal">—</div><div class="l">Total</div></div>
-      <div class="mini-stat done"><div class="v" id="statCompleted">—</div><div class="l">Completed</div></div>
-      <div class="mini-stat pend"><div class="v" id="statPending">—</div><div class="l">Pending</div></div>
-    </div>
-    <div class="batch-stamp">
-      <div class="batch-stamp-title">
-        <span>⏳ Pending Batches</span>
-        <span id="batchTotalLabel">—</span>
-      </div>
-      <div class="batch-grid" id="batchList">
-        <div style="text-align:center;color:#a0aec0;padding:14px;font-size:10px;grid-column:1/-1;"><span class="loading"></span> Loading...</div>
-      </div>
-    </div>
   </div>
 
   <!-- LOCATION -->
@@ -380,8 +332,6 @@ async function syncFromServer(showToast) {
     APP.lastSynced = new Date();
 
     populateLocationDropdown(res.locations || []);
-    renderDashboardStamp();
-    renderPendingBatches();
 
     if (APP.currentLocation) {
       applyFilters();
@@ -411,56 +361,6 @@ function populateLocationDropdown(locations) {
     sel.appendChild(o);
   });
   if (currentVal && locations.includes(currentVal)) sel.value = currentVal;
-}
-
-// ============================================================
-// DASHBOARD RENDER
-// ============================================================
-function renderDashboardStamp() {
-  const records = APP.allRecords;
-  const totalCount = records.length;
-  const completed = records.filter(r => r.jobCardNo && r.epicPhotoLink && r.aadharPhotoLink).length;
-  const pending = totalCount - completed;
-
-  document.getElementById('statTotal').textContent = totalCount;
-  document.getElementById('statCompleted').textContent = completed;
-  document.getElementById('statPending').textContent = pending;
-  document.getElementById('pendingBadge').textContent = pending + ' pending';
-}
-
-function renderPendingBatches() {
-  const records = APP.allRecords;
-  const locationMap = {};
-  records.forEach(r => {
-    const loc = (r.location || 'Unknown').trim();
-    if (!locationMap[loc]) locationMap[loc] = { total: 0, completed: 0, pending: 0 };
-    locationMap[loc].total++;
-    if (r.jobCardNo && r.epicPhotoLink && r.aadharPhotoLink) locationMap[loc].completed++;
-    else locationMap[loc].pending++;
-  });
-  const locations = Object.keys(locationMap).sort();
-
-  const batchGrid = document.getElementById('batchList');
-  const batchTotalLabel = document.getElementById('batchTotalLabel');
-  const pendingLocations = locations.filter(l => locationMap[l].pending > 0);
-  const totalPending = pendingLocations.reduce((s, l) => s + locationMap[l].pending, 0);
-  batchTotalLabel.textContent = totalPending + ' total';
-
-  if (!pendingLocations.length) {
-    batchGrid.innerHTML = `<div class="batch-empty" style="grid-column:1/-1;"><span class="ic">✅</span>All completed!</div>`;
-  } else {
-    pendingLocations.sort((a, b) => locationMap[b].pending - locationMap[a].pending);
-    let html = '';
-    pendingLocations.forEach(loc => {
-      html += `
-        <div class="batch-chip" title="${esc(loc)}">
-          <div class="b-loc">${esc(loc)}</div>
-          <div class="b-count">${locationMap[loc].pending}</div>
-        </div>
-      `;
-    });
-    batchGrid.innerHTML = html;
-  }
 }
 
 // ============================================================
@@ -943,8 +843,6 @@ async function saveRecord(rowIndex) {
       closeAllEdits();
       showMessage('✅ ' + res.message + '\n👤 ' + APP.currentUser.name, 'success');
 
-      renderDashboardStamp();
-      renderPendingBatches();
       applyFilters();
 
       setTimeout(() => {
